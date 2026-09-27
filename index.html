@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FrameBridge — Cuadros de resina epóxica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E7E1D3;--ink:#211D18;--sub:#5b5347;--card:rgba(255,255,255,.55);--border:rgba(33,29,24,.14);
+  --gold:#a8752f;--emerald:#1f5647;--wine:#6b2737;--shadow:0 20px 40px -22px rgba(33,29,24,.4);
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  box-sizing:border-box;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#17130E;--ink:#EDE6D6;--sub:#b8ad98;--card:rgba(255,255,255,.045);--border:rgba(255,255,255,.11);
+    --gold:#d4a85c;--emerald:#3e9c82;--wine:#c05a72;--shadow:0 20px 50px -20px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#17130E;--ink:#EDE6D6;--sub:#b8ad98;--card:rgba(255,255,255,.045);--border:rgba(255,255,255,.11);
+  --gold:#d4a85c;--emerald:#3e9c82;--wine:#c05a72;--shadow:0 20px 50px -20px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px);}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,.brand{font-family:'Fraunces',Georgia,'Times New Roman',serif;font-weight:600;margin:0;}
+a{color:inherit;text-decoration:none;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(1.25rem,4vw,3rem);}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+
+.pour{--c1:#333;--c2:#555;--c3:#999;position:relative;overflow:hidden;background:
+  radial-gradient(circle at 25% 28%,color-mix(in srgb,var(--c3) 65%,transparent),transparent 46%),
+  conic-gradient(from 200deg at 58% 42%,var(--c1),var(--c2),var(--c3),var(--c1));
+  filter:url(#grain);border-radius:38% 62% 63% 37% / 41% 44% 56% 59%;}
+.pour::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 18% 14%,rgba(255,255,255,.4),transparent 42%);mix-blend-mode:screen;}
+
+.site-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);}
+.bar{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 0;}
+.brand{font-size:1.35rem;letter-spacing:.01em;}
+.nav{display:flex;gap:1.75rem;font-size:.95rem;color:var(--sub);}
+.nav a:hover{color:var(--ink);}
+#cartBtn{position:relative;background:none;border:none;color:var(--ink);cursor:pointer;padding:.4rem;}
+#cartBadge{position:absolute;top:-2px;right:-6px;background:var(--wine);color:#fff;font-size:.65rem;min-width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(2rem,5vw,4rem);align-items:center;padding:clamp(3rem,7vw,5.5rem) 0 clamp(2.5rem,5vw,4rem);}
+.hero h1{font-size:clamp(2.3rem,4.6vw,3.6rem);line-height:1.08;max-width:14ch;}
+.hero .lead{color:var(--sub);max-width:42ch;font-size:1.05rem;margin:1.25rem 0 1.75rem;}
+.hero-visual{position:relative;}
+.hero-pour{aspect-ratio:1/1;width:100%;max-width:420px;margin-inline:auto;animation:sheen 18s ease-in-out infinite alternate;box-shadow:var(--shadow);}
+@keyframes sheen{from{filter:url(#grain) hue-rotate(0deg) saturate(1);}to{filter:url(#grain) hue-rotate(12deg) saturate(1.15);}}
+.visit-chip{position:absolute;left:50%;bottom:-14px;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);backdrop-filter:blur(8px);padding:.55rem 1.1rem;border-radius:2rem;font-size:.85rem;box-shadow:var(--shadow);white-space:nowrap;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--emerald);display:inline-block;margin-right:.45rem;animation:pulse 2.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.btn{display:inline-block;background:var(--ink);color:var(--bg);border:1px solid var(--ink);padding:.85rem 1.6rem;border-radius:2rem;font-family:'Manrope';font-weight:600;font-size:.95rem;cursor:pointer;transition:transform .15s,opacity .15s;}
+.btn:hover{opacity:.85;}
+.btn:active{transform:scale(.97);}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--border);}
+.btn.full{width:100%;text-align:center;}
+.btn.small{padding:.55rem 1.1rem;font-size:.85rem;border-radius:1.5rem;}
+
+.about{padding:2.5rem 0 clamp(3rem,6vw,5rem);border-top:1px solid var(--border);}
+.about .lead{max-width:60ch;color:var(--sub);font-size:1.05rem;}
+.facts{display:flex;gap:clamp(1.5rem,5vw,3.5rem);margin-top:1.75rem;flex-wrap:wrap;}
+.facts div{display:flex;flex-direction:column;gap:.2rem;}
+.facts strong{font-family:'Fraunces';font-size:1.3rem;}
+.facts span{color:var(--sub);font-size:.85rem;}
+
+.catalog{padding:1rem 0 clamp(3.5rem,7vw,6rem);}
+.catalog h2{font-size:clamp(1.7rem,3vw,2.3rem);margin-bottom:2rem;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2rem;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:1.4rem;padding:1.3rem;backdrop-filter:blur(6px);transition:transform .25s,box-shadow .25s;}
+.card:hover{transform:translateY(-5px);box-shadow:var(--shadow);}
+
+.card-img-wrap{aspect-ratio:3/4;width:100%;margin-bottom:1.1rem;overflow:hidden;border-radius:.8rem;position:relative;background:linear-gradient(155deg,color-mix(in srgb,var(--gold) 32%,var(--bg)),color-mix(in srgb,var(--wine) 26%,var(--bg)) 55%,color-mix(in srgb,var(--emerald) 28%,var(--bg)));}
+.card-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s ease,opacity .2s;}
+.card:hover .card-img{transform:scale(1.03);}
+
+.card h3{font-size:1.15rem;margin-bottom:.3rem;}
+.card .meta{color:var(--sub);font-size:.88rem;margin:0 0 1rem;}
+.card .row{display:flex;align-items:center;justify-content:space-between;}
+.card .price{font-family:'Fraunces';font-weight:600;font-size:1.15rem;}
+
+.site-footer{border-top:1px solid var(--border);padding:2.5rem 0;}
+.footfoot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;align-items:flex-end;}
+.brand.small{font-size:1.05rem;}
+.fine{color:var(--sub);font-size:.85rem;max-width:44ch;margin:.5rem 0 0;}
+
+.overlay{position:fixed;inset:0;background:rgba(10,8,6,.45);opacity:0;pointer-events:none;transition:opacity .25s;z-index:40;}
+.overlay.open{opacity:1;pointer-events:auto;}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(440px,100%);background:var(--bg);border-left:1px solid var(--border);transform:translateX(100%);transition:transform .35s cubic-bezier(.22,.8,.2,1);z-index:41;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+.drawer.open{transform:translateX(0);}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:1.4rem 1.5rem;border-bottom:1px solid var(--border);}
+#closeDrawer{background:none;border:none;color:var(--ink);font-size:1.1rem;cursor:pointer;}
+.drawer-body{flex:1;overflow-y:auto;padding:1.5rem;}
+.step{display:none;}
+.step.active{display:block;}
+.empty{color:var(--sub);text-align:center;padding:2rem 0;}
+
+.line{display:flex;align-items:center;gap:.9rem;padding:.9rem 0;border-bottom:1px solid var(--border);}
+.line-thumb{width:48px;height:48px;border-radius:.4rem;flex:none;overflow:hidden;background:linear-gradient(155deg,var(--gold),var(--wine));}
+.line-img{width:100%;height:100%;object-fit:cover;display:block;}
+.line-info{flex:1;min-width:0;}
+.line-info strong{display:block;font-size:.95rem;margin-bottom:.35rem;}
+.qty{display:flex;align-items:center;gap:.6rem;}
+.qty button{width:24px;height:24px;border-radius:50%;border:1px solid var(--border);background:none;color:var(--ink);cursor:pointer;line-height:1;}
+.line-price{font-size:.9rem;font-weight:600;white-space:nowrap;}
+.remove{background:none;border:none;color:var(--sub);cursor:pointer;font-size:.85rem;}
+
+.totals{margin-top:1.3rem;padding-top:1rem;border-top:1px dashed var(--border);font-size:.92rem;}
+.totals>div{display:flex;justify-content:space-between;padding:.3rem 0;color:var(--sub);}
+.totals .grand{color:var(--ink);font-weight:700;font-size:1.05rem;border-top:1px solid var(--border);margin-top:.4rem;padding-top:.6rem;}
+
+form label{display:block;font-size:.85rem;color:var(--sub);margin-bottom:1rem;}
+form input{display:block;width:100%;margin-top:.4rem;padding:.65rem .8rem;border-radius:.6rem;border:1px solid var(--border);background:var(--card);color:var(--ink);font-family:'Manrope';font-size:.95rem;}
+form .two{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.nav-btns{display:flex;gap:.8rem;margin-top:.5rem;}
+.nav-btns .btn{flex:1;}
+
+.ticket{border:1px solid var(--border);border-radius:1rem;padding:1.6rem;background:var(--card);}
+.ticket .tnote{color:var(--sub);font-size:.85rem;margin:.3rem 0 1.1rem;}
+.ticket .tmeta{font-size:.85rem;color:var(--sub);border-top:1px dashed var(--border);border-bottom:1px dashed var(--border);padding:.9rem 0;margin-bottom:.9rem;}
+.tline{display:flex;justify-content:space-between;font-size:.9rem;padding:.35rem 0;}
+.thanks{margin-top:1.2rem;font-family:'Fraunces';font-size:1.05rem;}
+.ticket-actions{display:flex;gap:.8rem;margin-top:1.3rem;}
+.ticket-actions .btn{flex:1;}
+
+@media (max-width:860px){.hero{grid-template-columns:1fr;}.hero-copy{order:1;}.hero-visual{order:0;}}
+@media (max-width:640px){.nav{display:none;}}
+@media print{
+  body *{visibility:hidden;}
+  #printArea,#printArea *{visibility:visible;}
+  #printArea{position:absolute;top:0;left:0;width:100%;border:none;}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs><filter id="grain" x="-20%" y="-20%" width="140%" height="140%">
+<feTurbulence type="fractalNoise" baseFrequency="0.012 0.05" numOctaves="2" seed="7" result="n"/>
+<feColorMatrix in="n" type="saturate" values="0"/>
+<feComponentTransfer><feFuncA type="linear" slope="0.12" intercept="0"/></feComponentTransfer>
+<feComposite operator="over" in2="SourceGraphic"/>
+</filter></defs>
+</svg>
+
+<header class="site-header">
+  <div class="wrap bar">
+    <span class="brand">FrameBridge</span>
+    <nav class="nav">
+      <a href="#catalog">Colección</a>
+      <a href="#about">Materiales</a>
+      <a href="#footer">Contacto</a>
+    </nav>
+    <button id="cartBtn" aria-label="Abrir carrito">
+      <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h2l2.2 11.4a2 2 0 002 1.6h8.6a2 2 0 002-1.7L21 8H6"/><circle cx="9.5" cy="20" r="1.4"/><circle cx="17.5" cy="20" r="1.4"/></svg>
+      <span id="cartBadge">0</span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <h1>Arte en resina, listo para tu pared</h1>
+      <p class="lead">Piezas hechas a mano en México, donde la resina epóxica e impresiones de alta definición se unen sobre madera hasta encontrar su forma final.</p>
+      <a href="#catalog" class="btn">Ver la colección</a>
+    </div>
+    <div class="hero-visual">
+      <div class="pour hero-pour" style="--c1:#0a2a3d;--c2:#0f4c63;--c3:#c9a24b"></div>
+      <div class="visit-chip"><span class="dot"></span><span class="visit-count">—</span> visitas al sitio</div>
+    </div>
+  </section>
+
+  <section id="about" class="about wrap">
+    <p class="lead">Cada cuadro parte de una base firme de madera, sellada y bañada en capas de resina epóxica de grado joyería. El curado asegura una superficie cristalina, resistente y duradera.</p>
+    <div class="facts">
+      <div><strong>100%</strong><span>hecho a mano</span></div>
+      <div><strong>7–14 días</strong><span>tiempo de curado</span></div>
+      <div><strong>Envíos</strong><span>a todo México</span></div>
+    </div>
+  </section>
+
+  <section id="catalog" class="catalog wrap">
+    <h2>La colección</h2>
+    <div id="grid" class="grid"></div>
+  </section>
+</main>
+
+<footer id="footer" class="site-footer">
+  <div class="wrap footfoot">
+    <div>
+      <span class="brand small">FrameBridge</span>
+      <p class="fine"><span class="visit-count">—</span> visitas desde que abrimos esta página. Cuadros de resina epóxica hechos a mano.</p>
+    </div>
+    <a href="mailto:marthaBridge115@framebridge.mx">marthaBridge115@framebridge.mx</a>
+  </div>
+</footer>
+
+<div id="overlay" class="overlay"></div>
+<aside id="drawer" class="drawer" aria-label="Carrito de compra">
+  <div class="drawer-head">
+    <h3>Tu carrito</h3>
+    <button id="closeDrawer" aria-label="Cerrar carrito">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div id="stepCart" class="step active"></div>
+
+    <div id="stepShipping" class="step">
+      <form id="shippingForm">
+        <label>Nombre completo<input id="shipName" required></label>
+        <label>Correo electrónico<input type="email" required></label>
+        <label>Teléfono<input type="tel" required pattern="[0-9]{10}" title="10 dígitos" placeholder="10 dígitos"></label>
+        <label>Dirección<input required placeholder="Calle, número, colonia"></label>
+        <div class="two">
+          <label>Ciudad<input required></label>
+          <label>Código postal<input required pattern="[0-9]{5}" title="5 dígitos"></label>
+        </div>
+        <div class="nav-btns">
+          <button type="button" class="btn ghost" id="backToCart">Atrás</button>
+          <button type="submit" class="btn full">Continuar a pago</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="stepPayment" class="step">
+      <form id="paymentForm">
+        <label>Número de tarjeta<input id="cardNumber" inputmode="numeric" required maxlength="19" placeholder="0000 0000 0000 0000"></label>
+        <label>Nombre en la tarjeta<input required></label>
+        <div class="two">
+          <label>Vencimiento<input id="cardExpiry" inputmode="numeric" required maxlength="5" placeholder="MM/AA"></label>
+          <label>CVV<input id="cardCvv" inputmode="numeric" required maxlength="3" placeholder="123"></label>
+        </div>
+        <p class="fine">Esta es una simulación de compra: no se realizará ningún cargo real.</p>
+        <div class="nav-btns">
+          <button type="button" class="btn ghost" id="backToShipping">Atrás</button>
+          <button type="submit" class="btn full">Confirmar pago</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="stepTicket" class="step"></div>
+  </div>
+</aside>
+
+<script>
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+
+const PRODUCTS=[
+  {id:1, name:'Póster Monterrey', desc:'Póster oficial FIFA World Cup 26 Monterrey.', size:'40×60 cm', price:2850, img:'1.jpeg'},
+  {id:2, name:'Ronaldo Sign', desc:'Fotografía firmada de Cristiano Ronaldo con acabado brillante.', size:'50×70 cm', price:2400, img:'2.jpeg'},
+  {id:3, name:'Póster Toronto', desc:'Póster oficial FIFA World Cup 26 Toronto.', size:'45×60 cm', price:3200, img:'3.jpeg'},
+  {id:4, name:'Póster Mexico City', desc:'Póster oficial FIFA World Cup 26 CDMX.', size:'40×50 cm', price:2650, img:'4.jpeg'},
+  {id:5, name:'Póster Miami', desc:'Póster oficial FIFA World Cup 26 Miami.', size:'60×80 cm', price:3600, img:'5.jpeg'},
+  {id:6, name:'Póster Monterrey Alt.', desc:'Edición especial alternativa FIFA World Cup 26 Monterrey.', size:'45×65 cm', price:2100, img:'6.jpeg'}
+];
+
+let cart=[];
+
+function fmt(n){return n.toLocaleString('es-MX',{style:'currency',currency:'MXN'});}
+function cartCount(){return cart.reduce((s,c)=>s+c.qty,0);}
+function updateBadge(){const n=cartCount();$('#cartBadge').textContent=n;$('#cartBadge').style.display=n?'flex':'none';}
+
+function renderGrid(){
+  $('#grid').innerHTML=PRODUCTS.map(p=>`
+    <article class="card">
+      <div class="card-img-wrap">
+        <img src="${p.img}" alt="${p.name}" class="card-img" loading="lazy" onerror="this.style.opacity='0'">
+      </div>
+      <h3>${p.name}</h3>
+      <p class="meta">${p.desc}<br>${p.size} en madera y resina epóxica de grado joyería.</p>
+      <div class="row">
+        <span class="price">${fmt(p.price)}</span>
+        <button class="btn small" data-add="${p.id}">Agregar</button>
+      </div>
+    </article>`).join('');
+}
+
+function totals(){
+  const subtotal=cart.reduce((s,c)=>{const p=PRODUCTS.find(x=>x.id===c.id);return s+p.price*c.qty;},0);
+  const envio=subtotal===0?0:(subtotal>=3000?0:180);
+  const iva=(subtotal+envio)*0.16;
+  const total=subtotal+envio+iva;
+  return {subtotal,envio,iva,total};
+}
+
+function renderCartStep(){
+  const box=$('#stepCart');
+  if(cart.length===0){
+    box.innerHTML=`<p class="empty">Tu carrito está vacío. Elige una pieza de la colección.</p>`;
+    return;
+  }
+  const {subtotal,envio,iva,total}=totals();
+  box.innerHTML=`
+    <div class="lines">${cart.map(c=>{
+      const p=PRODUCTS.find(x=>x.id===c.id);
+      return `<div class="line">
+        <div class="line-thumb"><img src="${p.img}" alt="${p.name}" class="line-img" onerror="this.style.opacity='0'"></div>
+        <div class="line-info"><strong>${p.name}</strong>
+          <div class="qty">
+            <button data-dec="${p.id}" aria-label="Quitar una unidad">−</button>
+            <span>${c.qty}</span>
+            <button data-inc="${p.id}" aria-label="Agregar una unidad">+</button>
+          </div>
+        </div>
+        <div class="line-price">${fmt(p.price*c.qty)}</div>
+        <button class="remove" data-rm="${p.id}" aria-label="Eliminar">✕</button>
+      </div>`;
+    }).join('')}</div>
+    <div class="totals">
+      <div><span>Subtotal</span><span>${fmt(subtotal)}</span></div>
+      <div><span>Envío</span><span>${envio===0?'Gratis':fmt(envio)}</span></div>
+      <div><span>IVA (16%)</span><span>${fmt(iva)}</span></div>
+      <div class="grand"><span>Total</span><span>${fmt(total)}</span></div>
+    </div>
+    <button class="btn full" id="toShipping" style="margin-top:1.3rem">Continuar a envío</button>`;
+}
+
+function goStep(name){
+  $$('.step').forEach(s=>s.classList.remove('active'));
+  $('#step'+name).classList.add('active');
+  $('.drawer-body').scrollTop=0;
+}
+function openDrawer(){$('#overlay').classList.add('open');$('#drawer').classList.add('open');document.body.style.overflow='hidden';}
+function closeDrawer(){$('#overlay').classList.remove('open');$('#drawer').classList.remove('open');document.body.style.overflow='';}
+
+function renderTicket(){
+  const {subtotal,envio,iva,total}=totals();
+  const order='FB-'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,5).toUpperCase();
+  const date=new Date().toLocaleString('es-MX',{dateStyle:'long',timeStyle:'short'});
+  const name=$('#shipName').value||'Cliente';
+  const cardEnd=($('#cardNumber').value||'').replace(/\D/g,'').slice(-4)||'0000';
+  const lines=cart.map(c=>{const p=PRODUCTS.find(x=>x.id===c.id);return `<div class="tline"><span>${p.name} ×${c.qty}</span><span>${fmt(p.price*c.qty)}</span></div>`;}).join('');
+  $('#stepTicket').innerHTML=`
+    <div class="ticket" id="printArea">
+      <h3 class="brand">FrameBridge</h3>
+      <p class="tnote">Comprobante de tu compra simulada.</p>
+      <p class="tmeta">Folio ${order}<br>${date}<br>Cliente: ${name}<br>Tarjeta terminación ${cardEnd}</p>
+      <div class="tlines">${lines}</div>
+      <div class="totals">
+        <div><span>Subtotal</span><span>${fmt(subtotal)}</span></div>
+        <div><span>Envío</span><span>${envio===0?'Gratis':fmt(envio)}</span></div>
+        <div><span>IVA (16%)</span><span>${fmt(iva)}</span></div>
+        <div class="grand"><span>Total pagado</span><span>${fmt(total)}</span></div>
+      </div>
+      <p class="thanks">Gracias por tu compra, ${name.split(' ')[0]}.</p>
+    </div>
+    <div class="ticket-actions">
+      <button class="btn ghost" id="printTicket">Imprimir ticket</button>
+      <button class="btn full" id="newPurchase">Nueva compra</button>
+    </div>`;
+  $('#printTicket').onclick=()=>window.print();
+  $('#newPurchase').onclick=()=>{closeDrawer();$('#shippingForm').reset();$('#paymentForm').reset();goStep('Cart');renderCartStep();};
+}
+
+renderGrid();
+$('#grid').addEventListener('click',e=>{
+  const btn=e.target.closest('[data-add]');
+  if(!btn)return;
+  const id=Number(btn.dataset.add);
+  const item=cart.find(c=>c.id===id);
+  if(item)item.qty++;else cart.push({id,qty:1});
+  updateBadge();renderCartStep();
+  btn.textContent='Agregado ✓';
+  setTimeout(()=>btn.textContent='Agregar',900);
+});
+
+$('#stepCart').addEventListener('click',e=>{
+  const inc=e.target.closest('[data-inc]');
+  const dec=e.target.closest('[data-dec]');
+  const rm=e.target.closest('[data-rm]');
+  const go=e.target.closest('#toShipping');
+  if(inc){const it=cart.find(c=>c.id===Number(inc.dataset.inc));it.qty++;}
+  if(dec){const it=cart.find(c=>c.id===Number(dec.dataset.dec));it.qty--;if(it.qty<=0)cart=cart.filter(c=>c.id!==it.id);}
+  if(rm){cart=cart.filter(c=>c.id!==Number(rm.dataset.rm));}
+  if(inc||dec||rm){updateBadge();renderCartStep();}
+  if(go)goStep('Shipping');
+});
+
+$('#cartBtn').addEventListener('click',()=>{openDrawer();goStep('Cart');renderCartStep();});
+$('#closeDrawer').addEventListener('click',closeDrawer);
+$('#overlay').addEventListener('click',closeDrawer);
+$('#backToCart').addEventListener('click',()=>goStep('Cart'));
+$('#backToShipping').addEventListener('click',()=>goStep('Shipping'));
+
+$('#shippingForm').addEventListener('submit',e=>{e.preventDefault();goStep('Payment');});
+$('#paymentForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  renderTicket();
+  cart=[];updateBadge();
+  goStep('Ticket');
+});
+
+$('#cardNumber').addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim();});
+$('#cardExpiry').addEventListener('input',e=>{let v=e.target.value.replace(/\D/g,'').slice(0,4);if(v.length>2)v=v.slice(0,2)+'/'+v.slice(2);e.target.value=v;});
+$('#cardCvv').addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,3);});
+
+async function initVisits(){
+  let count=null;
+  try{
+    const db=await claude.use('db');
+    if(db){
+      const ref=db.doc('stats/visits');
+      const snap=await ref.get();
+      const data=snap&&typeof snap.data==='function'?snap.data():snap;
+      let current=(data&&typeof data.count==='number')?data.count:0;
+      current+=1;
+      await ref.set({count:current});
+      count=current;
+    }
+  }catch(e){}
+  if(count===null){
+    try{count=parseInt(localStorage.getItem('fb_visits')||'0',10)+1;localStorage.setItem('fb_visits',String(count));}
+    catch(e){count=1;}
+  }
+  $$('.visit-count').forEach(el=>el.textContent=count.toLocaleString('es-MX'));
+}
+
+updateBadge();
+renderCartStep();
+initVisits();
+</script>
+</body>
+</html>
